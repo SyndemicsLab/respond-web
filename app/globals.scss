@@ -531,3 +531,33 @@ label {
         color-morph 3000ms linear;
     animation-iteration-count: infinite;
 }
+
+#maintenance {
+    display: grid;
+    grid-template: 1fr;
+    overflow: auto;
+    margin: auto;
+    padding: 0 3rem;
+    text-align: center;
+    font-weight: 500;
+
+    .maint-heading {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    h1 {
+        font:
+            600 50px/55px "IBM Plex Sans",
+            sans-serif;
+        background: linear-gradient(
+            270deg,
+            var(--primary-color),
+            var(--tertiary-color),
+            var(--secondary-color)
+        );
+        color: transparent;
+        background-clip: text;
+    }
+}

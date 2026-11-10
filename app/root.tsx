@@ -6,15 +6,29 @@ import {
     Outlet,
     Scripts,
     ScrollRestoration,
+    useLoaderData,
 } from "react-router";
 
 import { sitemap } from "~/sitemap";
 import Navbar from "@components/ui/navbar";
 import Footer from "@components/ui/footer";
+import Maintenance from "@components/ui/maintenance";
 import appStylesHref from "~/globals.scss?url";
 import tailwindStyle from "~/styles/tailwind.css?url";
 
+export async function loader() {
+    return {
+        maintenance: Boolean(Number(process.env.MAINTENANCE)),
+    };
+}
+
 export default function App() {
+    const env = useLoaderData<typeof loader>();
+
+    if (env.maintenance) {
+        return <Maintenance />;
+    }
+
     return (
         <>
             <Navbar paths={sitemap} />
@@ -67,6 +81,7 @@ export function ErrorBoundary({ error }: { error: Route.ErrorBoundaryProps }) {
                 ? "The requested page could not be found."
                 : error.statusText || details;
     }
+
     return (
         <main id="error-page">
             <h1>{message}</h1>
