@@ -26,9 +26,7 @@ export default function App() {
     const env = useLoaderData<typeof loader>();
 
     if (env.maintenance) {
-        return (
-            <Maintenance />
-        );
+        return <Maintenance />;
     }
 
     return (
