@@ -19,6 +19,10 @@
     h1 {
         font-size: 24px;
         font-weight: 600;
+
+        @media (max-width: 700px) {
+            margin-bottom: 1rem;
+        }
     }
 }
 
@@ -712,9 +716,19 @@ input[type="text"].intervention-name-input-error {
         transition: opacity;
         transition-duration: var(--transition-duration);
         pointer-events: none;
+        font-weight: 400;
+        font-size: 0.9rem;
     }
 
     &:hover .input-tooltip-hover {
         opacity: 0.9;
+    }
+
+    @media (max-width: 700px) {
+        & .input-tooltip-hover {
+            width: 50vw;
+            left: unset;
+            bottom: 1.5rem;
+        }
     }
 }
