@@ -13,6 +13,10 @@ import Navbar from "@components/ui/navbar";
 import Footer from "@components/ui/footer";
 import appStylesHref from "~/globals.scss?url";
 import tailwindStyle from "~/styles/tailwind.css?url";
+import syndemicslogo from "~/images/logo.png?no-inline";
+
+const ORIGIN = import.meta.env.VITE_APP_ORIGIN ?? "http://localhost:5173";
+const absolute = (path: string) => new URL(path, ORIGIN).href;
 
 export default function App() {
     return (
@@ -33,17 +37,46 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     name="viewport"
                     content="width=device-width, initial-scale=1.0"
                 />
+                <title>RESPOND — Syndemics Lab</title>
+                <meta name="author" content="The Syndemics Lab at Boston Medical Center" />
                 <meta name="icon" content="/favicon.ico" />
                 <meta title="RESPOND Simulation" />
                 <meta
                     name="description"
                     content="The Syndemics Lab at Boston Medical Center's RESPOND simulation as a web application."
                 />
+                <meta
+                    property="og:title"
+                    content="RESPOND Simulation"
+                />
+                <meta
+                    property="og:description"
+                    content="The Syndemics Lab at Boston Medical Center's RESPOND simulation as a web application."
+                />
+                <meta
+                    property="og:image:type"
+                    content="image/png"
+                />
+                <meta
+                    property="og:image:width"
+                    content="500"
+                />
+                <meta
+                    property="og:image:height"
+                    content="500"
+                />
+                <meta
+                    property="og:image:height"
+                    content="500"
+                />
+                <meta
+                    property="og:image"
+                    content={absolute(syndemicslogo)}
+                />
                 <link rel="stylesheet" href={tailwindStyle} />
                 <link rel="stylesheet" href={appStylesHref} />
                 <link rel="icon" sizes="32x32" href="/favicon.ico" />
                 <Links />
-                <title>RESPOND — Syndemics Lab</title>
             </head>
             <body>
                 <div id="content">{children}</div>
