@@ -37,14 +37,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <title>RESPOND — Syndemics Lab</title>
                 <meta name="author" content="The Syndemics Lab at Boston Medical Center" />
                 <meta name="icon" content="/favicon.ico" />
-                <meta title="RESPOND Simulation" />
+                <meta title="RESPOND Simulation — Syndemics Lab" />
                 <meta
                     name="description"
                     content="The Syndemics Lab at Boston Medical Center's RESPOND simulation as a web application."
                 />
                 <meta
                     property="og:title"
-                    content="RESPOND Simulation"
+                    content="RESPOND Simulation — Syndemics Lab"
                 />
                 <meta
                     property="og:description"
