@@ -15,9 +15,6 @@ import appStylesHref from "~/globals.scss?url";
 import tailwindStyle from "~/styles/tailwind.css?url";
 import syndemicslogo from "~/images/logo.png?no-inline";
 
-const ORIGIN = import.meta.env.VITE_APP_ORIGIN ?? "http://localhost:5173";
-const absolute = (path: string) => new URL(path, ORIGIN).href;
-
 export default function App() {
     return (
         <>
@@ -71,7 +68,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 />
                 <meta
                     property="og:image"
-                    content={absolute(syndemicslogo)}
+                    content={syndemicslogo}
                 />
                 <link rel="stylesheet" href={tailwindStyle} />
                 <link rel="stylesheet" href={appStylesHref} />
