@@ -35,7 +35,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     content="width=device-width, initial-scale=1.0"
                 />
                 <title>RESPOND — Syndemics Lab</title>
-                <meta name="author" content="The Syndemics Lab at Boston Medical Center" />
+                <meta
+                    name="author"
+                    content="The Syndemics Lab at Boston Medical Center"
+                />
                 <meta name="icon" content="/favicon.ico" />
                 <meta title="RESPOND Simulation — Syndemics Lab" />
                 <meta
@@ -50,26 +53,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     property="og:description"
                     content="The Syndemics Lab at Boston Medical Center's RESPOND simulation as a web application."
                 />
-                <meta
-                    property="og:image:type"
-                    content="image/png"
-                />
-                <meta
-                    property="og:image:width"
-                    content="500"
-                />
-                <meta
-                    property="og:image:height"
-                    content="500"
-                />
-                <meta
-                    property="og:image:height"
-                    content="500"
-                />
-                <meta
-                    property="og:image"
-                    content={syndemicslogo}
-                />
+                <meta property="og:image:type" content="image/png" />
+                <meta property="og:image:width" content="500" />
+                <meta property="og:image:height" content="500" />
+                <meta property="og:image:height" content="500" />
+                <meta property="og:image" content={syndemicslogo} />
                 <link rel="stylesheet" href={tailwindStyle} />
                 <link rel="stylesheet" href={appStylesHref} />
                 <link rel="icon" sizes="32x32" href="/favicon.ico" />
