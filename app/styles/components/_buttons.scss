@@ -136,10 +136,12 @@
     border-radius: math.div($size, 2);
     justify-content: center;
     align-items: center;
+
     &:hover {
         background-color: $hover-color;
     }
-    & > * {
+
+    & > svg {
         height: $font-size;
         width: $font-size;
     }

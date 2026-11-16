@@ -1,3 +1,19 @@
+////////////////////////////////////////////////////////////////////////////////
+// File: tooltip.tsx                                                          //
+// Project: merc-ui                                                           //
+// Created: 2026-11-16                                                        //
+// Author: Dimitri Baptiste                                                   //
+// -----                                                                      //
+// Last Modified: 2026-11-16                                                  //
+// Modified By: Dimitri Baptiste                                              //
+// -----                                                                      //
+// Copyright (c) 2026 Syndemics Lab at Boston Medical Center                  //
+////////////////////////////////////////////////////////////////////////////////
+
+// type imports
+import { type ReactNode } from "react";
+
+// component imports
 import {
     Dialog,
     DialogContent,
@@ -11,6 +27,15 @@ interface TooltipProps {
     inputName: string;
     body: string;
     hover?: boolean;
+}
+
+export function WrappedTooltip({ children, body }: { children: ReactNode, body: string }) {
+    return (
+        <div className="input-tooltip-wrapper">
+            {children}
+            <div className="input-tooltip-hover">{body}</div>
+        </div>
+    );
 }
 
 function HoverTooltip({ body }: { body: string }) {

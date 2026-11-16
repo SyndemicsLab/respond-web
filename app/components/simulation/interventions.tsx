@@ -14,7 +14,7 @@ import type {
     Overdose,
 } from "~/features/simulation/model";
 import { useState } from "react";
-import Slider from "~/components/ui/slider";
+import Slider from "@components/ui/slider";
 import {
     Dialog,
     DialogContent,
@@ -32,6 +32,7 @@ import {
     CollapsibleTrigger,
 } from "@radix-ui/react-collapsible";
 import { PROPORTION_MIN, PROPORTION_STEP, PROPORTION_MAX } from "~/globals";
+import { WrappedTooltip } from "@components/ui/tooltip";
 
 function normalizeInterventionName(name: string): string {
     return name.trim().replace(/\s+/g, " ");
@@ -143,17 +144,21 @@ function Tabs({
         <>
             <div className="interventionTabs">
                 {interventions.map((intervention) => (
+                    <WrappedTooltip body={intervention.name}>
                     <Tab
                         key={intervention.id}
                         intervention={intervention}
                         nameError={nameErrorsById[intervention.id]}
                     />
+                    </WrappedTooltip>
                 ))}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <button className="interventionTab addTab disabled">
-                            + New Intervention
-                        </button>
+                        <WrappedTooltip body="This is how you can add a new setting to the model. For example, you could add ‘Residential with Buprenorphine.’">
+                            <button className="interventionTab addTab">
+                                + New Intervention
+                            </button>
+                        </WrappedTooltip>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="add-intervention-dropdown">
                         <DropdownMenuItem
