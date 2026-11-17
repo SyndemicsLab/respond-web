@@ -293,7 +293,7 @@ export default function Input({
                             run the simulation:
                         </p>
                         {Object.keys(interventionNameErrors).length ||
-                            populationConstraintError ? (
+                        populationConstraintError ? (
                             <div className="run-error-list">
                                 <ol>
                                     {Object.entries(interventionNameErrors).map(
