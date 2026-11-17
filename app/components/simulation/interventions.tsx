@@ -153,13 +153,13 @@ function Tabs({
                     </WrappedTooltip>
                 ))}
                 <DropdownMenu>
+                    <WrappedTooltip body="This is how you can add a new setting to the model. For example, you could add ‘Residential with Buprenorphine.’">
                     <DropdownMenuTrigger asChild>
-                        <WrappedTooltip body="This is how you can add a new setting to the model. For example, you could add ‘Residential with Buprenorphine.’">
-                            <button className="interventionTab addTab">
-                                + New Intervention
-                            </button>
-                        </WrappedTooltip>
+                        <button className="interventionTab addTab">
+                            + New Intervention
+                        </button>
                     </DropdownMenuTrigger>
+                    </WrappedTooltip>
                     <DropdownMenuContent className="add-intervention-dropdown">
                         <DropdownMenuItem
                             className="add-intervention-item"
