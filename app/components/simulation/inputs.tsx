@@ -124,7 +124,8 @@ export function RunStatus({ result }: { result?: SimulationRunResponse }) {
         return <p>There was an issue with the simulation outcomes.</p>;
     }
 
-    const modelOutcome = JSON.parse(resultBody)["result"][0];
+    const modelOutcome = JSON.parse(resultBody);
+
     // background death
     const bgDeathData =
         modelOutcome["background_death"].map(accumulateTimesteps);

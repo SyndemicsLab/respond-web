@@ -145,15 +145,11 @@ describe("Simulation route contract", () => {
                     ok: true,
                     status: 200,
                     result: JSON.stringify({
-                        result: [
-                            {
-                                background_death: [[0], [0], [0]],
-                                total_overdose: [[0], [0], [0]],
-                                fatal_overdose: [[0], [0], [0]],
-                                state: [[0], [0], [0]],
-                                intervention_admission: [[0], [0], [0]],
-                            },
-                        ],
+                        background_death: [[0], [0], [0]],
+                        total_overdose: [[0], [0], [0]],
+                        fatal_overdose: [[0], [0], [0]],
+                        state: [[0], [0], [0]],
+                        intervention_admission: [[0], [0], [0]],
                     }),
                 }}
             />,
