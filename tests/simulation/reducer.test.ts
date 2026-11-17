@@ -78,8 +78,8 @@ describe("Simulation reducer domain transitions", () => {
         expect(afterNoTreatment?.active).toBe(true);
         expect(afterNoTreatment?.population).toBe(
             (beforeNoTreatment?.population ?? 0) +
-            (toDelete?.population ?? 0) +
-            (toDelete?.postPopulation ?? 0),
+                (toDelete?.population ?? 0) +
+                (toDelete?.postPopulation ?? 0),
         );
 
         next.interventions.forEach((intervention) => {

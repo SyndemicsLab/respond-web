@@ -23,6 +23,20 @@ function createMockStorage() {
     };
 }
 
+function createThrowingStorage() {
+    return {
+        getItem() {
+            throw new Error("Storage unavailable");
+        },
+        setItem() {
+            throw new Error("Storage unavailable");
+        },
+        removeItem() {
+            throw new Error("Storage unavailable");
+        },
+    };
+}
+
 describe("Simulation session storage", () => {
     it("persists and restores simulation session inputs", () => {
         const storage = createMockStorage();
@@ -82,5 +96,15 @@ describe("Simulation session storage", () => {
 
         expect(storage.snapshot()["simulation-session-inputs"]).toBeUndefined();
         expect(storage.snapshot()["simulation-session-meta"]).toBeUndefined();
+    });
+
+    it("continues when browser storage is unavailable", () => {
+        const storage = createThrowingStorage();
+
+        expect(readSessionInputsFromStorage(storage)).toBeNull();
+        expect(() =>
+            persistSessionInputsToStorage(inputs, storage),
+        ).not.toThrow();
+        expect(() => clearSessionInputsFromStorage(storage)).not.toThrow();
     });
 });

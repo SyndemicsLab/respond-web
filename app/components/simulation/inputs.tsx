@@ -1,5 +1,8 @@
 // Package types
-import type { SimulationRunResponse } from "@components/simulation/types";
+import {
+    parseSimulationModelOutcome,
+    type SimulationRunResponse,
+} from "@components/simulation/types";
 import type { Intervention } from "~/features/simulation/model";
 
 // Node, React, and React Router imports
@@ -124,7 +127,10 @@ export function RunStatus({ result }: { result?: SimulationRunResponse }) {
         return <p>There was an issue with the simulation outcomes.</p>;
     }
 
-    const modelOutcome = JSON.parse(resultBody);
+    const modelOutcome = parseSimulationModelOutcome(resultBody);
+    if (modelOutcome === null) {
+        return <p>There was an issue with the simulation outcomes.</p>;
+    }
 
     // background death
     const bgDeathData =
