@@ -124,7 +124,8 @@ export function RunStatus({ result }: { result?: SimulationRunResponse }) {
         return <p>There was an issue with the simulation outcomes.</p>;
     }
 
-    const modelOutcome = JSON.parse(resultBody)["result"][0];
+    const modelOutcome = JSON.parse(resultBody);
+
     // background death
     const bgDeathData =
         modelOutcome["background_death"].map(accumulateTimesteps);
@@ -292,7 +293,7 @@ export default function Input({
                             run the simulation:
                         </p>
                         {Object.keys(interventionNameErrors).length ||
-                        populationConstraintError ? (
+                            populationConstraintError ? (
                             <div className="run-error-list">
                                 <ol>
                                     {Object.entries(interventionNameErrors).map(
