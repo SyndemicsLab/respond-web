@@ -114,6 +114,40 @@ describe("Simulation reducer domain transitions", () => {
         expect(noTreatment?.population).toBe(next.total_population - treated);
     });
 
+    it("does not depend on intervention order when changing population", () => {
+        const state = makeState();
+        const reorderedState = {
+            ...state,
+            interventions: [...state.interventions].reverse(),
+        };
+
+        const next = changeInterventionPopulation(reorderedState, 1, 50000);
+
+        const treated = next.interventions
+            .filter((i) => i.id !== 0)
+            .reduce(
+                (acc, i) => acc + i.population + (i.postPopulation ?? 0),
+                0,
+            );
+        const noTreatment = next.interventions.find((i) => i.id === 0);
+        expect(noTreatment?.population).toBe(next.total_population - treated);
+    });
+
+    it("leaves state unchanged when the target self-transition is missing", () => {
+        const state = makeState();
+        const intervention = state.interventions.find((i) => i.id === 1);
+        if (intervention === undefined) {
+            throw new Error("Test fixture is missing intervention 1");
+        }
+        intervention.transitions = intervention.transitions.filter(
+            (transition) => transition.id !== intervention.id,
+        );
+
+        const next = changeInterventionPopulation(state, 1, 50000);
+
+        expect(next).toBe(state);
+    });
+
     it("reports a slider constraint violation when intervention populations exceed total population", () => {
         const state = makeState();
 
@@ -143,6 +177,8 @@ describe("Simulation reducer domain transitions", () => {
 
     it("changes intervention transition probability with rounding", () => {
         const state = makeState();
+        const originalNoTreatment = state.interventions.find((i) => i.id === 0);
+        const originalPopulation = originalNoTreatment?.population;
 
         const next = changeInterventionTransition(state, 1, 0, 12.345678);
         const intervention = next.interventions.find((i) => i.id === 1);
@@ -151,6 +187,7 @@ describe("Simulation reducer domain transitions", () => {
         );
 
         expect(updatedTransition?.probability).toBe(12.3457);
+        expect(originalNoTreatment?.population).toBe(originalPopulation);
     });
 
     it("rejects transition updates that exceed probability limit", () => {

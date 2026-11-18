@@ -390,20 +390,28 @@ export function changeInterventionPopulation(
     interventionID: number,
     value: number,
 ): Inputs {
-    // can safely change postPopulation here because NT population is read only
+    const intervention = simulationInputs.interventions.find(
+        (i) => i.id === interventionID,
+    );
+    if (intervention === undefined) {
+        return simulationInputs;
+    }
+
+    const selfTransition = intervention.transitions.find(
+        (transition) => transition.id === interventionID,
+    );
+    if (selfTransition === undefined) {
+        return simulationInputs;
+    }
+
     const newInterventions = simulationInputs.interventions.map(
         (i: Intervention) => {
             if (i.id === interventionID) {
                 return {
                     ...i,
                     population: value,
-                    // initial population in post-treatment is the initial
-                    // population times the transition proportion
                     postPopulation: Math.round(
-                        (value *
-                            i.transitions.filter((t) => t.id === i.id)[0]
-                                .probability) /
-                            100,
+                        (value * selfTransition.probability) / 100,
                     ),
                 };
             }
@@ -423,16 +431,17 @@ export function changeInterventionPopulation(
                 intervention.postPopulation
             );
         }, 0);
-    newInterventions[0] = {
-        ...newInterventions[0],
-        population: Math.max(
-            simulationInputs.total_population - treatedPopulation,
-            0,
-        ),
-    };
+    const noTreatmentPopulation = Math.max(
+        simulationInputs.total_population - treatedPopulation,
+        0,
+    );
     return {
         ...simulationInputs,
-        interventions: newInterventions,
+        interventions: newInterventions.map((intervention) =>
+            intervention.id === 0
+                ? { ...intervention, population: noTreatmentPopulation }
+                : intervention,
+        ),
     };
 }
 
@@ -489,22 +498,21 @@ export function changeInterventionTransition(
             i.postPopulation ? i.population + i.postPopulation : i.population,
         );
 
-    const noTreatment: Intervention | undefined = newInterventions.find(
-        (i) => i.id === 0,
+    const noTreatmentPopulation = Math.max(
+        simulationInputs.total_population -
+            treatedPopulation.reduce((accumulator, value) => {
+                return accumulator + value;
+            }, 0),
+        0,
     );
-    if (noTreatment) {
-        noTreatment.population = Math.max(
-            simulationInputs.total_population -
-                treatedPopulation.reduce((accumulator, value) => {
-                    return accumulator + value;
-                }, 0),
-            0,
-        );
-    }
 
     return {
         ...simulationInputs,
-        interventions: newInterventions,
+        interventions: newInterventions.map((intervention) =>
+            intervention.id === 0
+                ? { ...intervention, population: noTreatmentPopulation }
+                : intervention,
+        ),
     };
 }
 

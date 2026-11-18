@@ -1,333 +1,59 @@
 // Package types
 import type { Route } from "./+types/simulation";
-import type { Inputs, Intervention } from "~/features/simulation/model";
 import type {
     SimulationLoaderData,
     SimulationRunResponse,
-    SimulationSessionMeta,
-    SimulationStorage,
 } from "@components/simulation/types";
 
 // Node, React, and React Router imports
-import { useFetcher, Await, Link, useLoaderData } from "react-router";
-import { useRef, useState, useEffect, Suspense } from "react";
+import {
+    Await,
+    useLoaderData,
+    useRevalidator,
+    isRouteErrorResponse,
+} from "react-router";
+import { Suspense } from "react";
 
 // Component imports
-import ScrollIndicator, {
-    ScrollDirection,
-} from "@components/ui/scroll-indicator";
-import { InputProvider, useInputs } from "@components/input-contexts";
-import {
-    validateInterventionNames,
-    getInterventionNameErrors,
-} from "@simulation/interventions";
-import Input from "@simulation/inputs";
+import { InputProvider } from "@components/input-contexts";
+import SimulationContent from "@components/simulation/simulation-content";
 
 // Asset imports
-import respond from "~/images/diagram/system.svg";
-import { getSliderConstraintError } from "~/features/simulation/reducer";
+import {
+    invalidRunRequest,
+    mapRunRequest,
+    mapRunResponse,
+    readResponseBody,
+} from "~/features/simulation/api";
+import { isInputsLike } from "~/features/simulation/validation";
+import {
+    DEFAULT_INPUTS_KEY,
+    applySessionInputsToLoaderData,
+    clearSessionInputsFromStorage,
+    makeCachedDefaults,
+    makeLoaderData,
+    normalizeLoaderData,
+    parseCachedDefaults,
+    persistSessionInputsToStorage,
+    readSessionInputsFromStorage,
+    safeGetItem,
+    safeRemoveItem,
+    safeSetItem,
+} from "~/features/simulation/storage";
 import "~/styles/simulation.scss";
 
-const DEFAULT_INPUTS_KEY = "default-inputs";
-const SESSION_INPUTS_KEY = "simulation-session-inputs";
-const SESSION_META_KEY = "simulation-session-meta";
-const SESSION_SCHEMA_VERSION = 1;
-const SESSION_WRITE_DEBOUNCE_MS = 200;
+export {
+    applySessionInputsToLoaderData,
+    clearSessionInputsFromStorage,
+    makeCachedDefaults,
+    makeLoaderData,
+    normalizeLoaderData,
+    parseCachedDefaults,
+    persistSessionInputsToStorage,
+    readSessionInputsFromStorage,
+};
 
-function cloneIntervention(intervention: Intervention): Intervention {
-    return {
-        ...intervention,
-        transitions: intervention.transitions.map((transition) => ({
-            ...transition,
-        })),
-        overdose: intervention.overdose.map((overdose) => ({ ...overdose })),
-    };
-}
-
-function cloneInputs(inputs: Inputs): Inputs {
-    return {
-        ...inputs,
-        interventions: inputs.interventions.map(cloneIntervention),
-    };
-}
-
-function isTransitionLike(value: unknown): boolean {
-    if (typeof value !== "object" || value === null) {
-        return false;
-    }
-    const candidate = value as {
-        id?: unknown;
-        name?: unknown;
-        probability?: unknown;
-    };
-    return (
-        typeof candidate.id === "number" &&
-        typeof candidate.name === "string" &&
-        typeof candidate.probability === "number"
-    );
-}
-
-function isOverdoseLike(value: unknown): boolean {
-    if (typeof value !== "object" || value === null) {
-        return false;
-    }
-    const candidate = value as { probability?: unknown; injection?: unknown };
-    return (
-        typeof candidate.probability === "number" &&
-        typeof candidate.injection === "boolean"
-    );
-}
-
-function isInterventionLike(value: unknown): boolean {
-    if (typeof value !== "object" || value === null) {
-        return false;
-    }
-
-    const candidate = value as {
-        id?: unknown;
-        name?: unknown;
-        active?: unknown;
-        population?: unknown;
-        transitions?: unknown;
-        overdose?: unknown;
-    };
-
-    if (
-        typeof candidate.id !== "number" ||
-        typeof candidate.name !== "string" ||
-        typeof candidate.active !== "boolean" ||
-        typeof candidate.population !== "number"
-    ) {
-        return false;
-    }
-
-    if (
-        !Array.isArray(candidate.transitions) ||
-        !Array.isArray(candidate.overdose)
-    ) {
-        return false;
-    }
-
-    return (
-        candidate.transitions.every(isTransitionLike) &&
-        candidate.overdose.every(isOverdoseLike)
-    );
-}
-
-function isInputsLike(value: unknown): value is Inputs {
-    if (typeof value !== "object" || value === null) {
-        return false;
-    }
-
-    const candidate = value as {
-        duration?: unknown;
-        total_population?: unknown;
-        changing_population?: unknown;
-        fatal_overdoses?: unknown;
-        interventions?: unknown;
-    };
-
-    if (
-        typeof candidate.duration !== "number" ||
-        typeof candidate.total_population !== "number" ||
-        typeof candidate.changing_population !== "number" ||
-        typeof candidate.fatal_overdoses !== "number" ||
-        !Array.isArray(candidate.interventions)
-    ) {
-        return false;
-    }
-
-    return candidate.interventions.every(isInterventionLike);
-}
-
-function isSimulationLoaderDataLike(
-    value: unknown,
-): value is SimulationLoaderData {
-    if (typeof value !== "object" || value === null) {
-        return false;
-    }
-
-    const candidate = value as {
-        initialInputs?: unknown;
-        presets?: unknown;
-    };
-
-    if (
-        !isInputsLike(candidate.initialInputs) ||
-        !Array.isArray(candidate.presets)
-    ) {
-        return false;
-    }
-
-    return candidate.presets.every(isInterventionLike);
-}
-
-function parseJson(raw: string): unknown {
-    try {
-        return JSON.parse(raw);
-    } catch {
-        return null;
-    }
-}
-
-function parseSessionMeta(raw: string | null): SimulationSessionMeta | null {
-    if (raw === null) {
-        return null;
-    }
-
-    const parsed = parseJson(raw);
-    if (typeof parsed !== "object" || parsed === null) {
-        return null;
-    }
-
-    const candidate = parsed as {
-        schemaVersion?: unknown;
-        lastUpdated?: unknown;
-    };
-
-    if (
-        typeof candidate.schemaVersion !== "number" ||
-        typeof candidate.lastUpdated !== "number"
-    ) {
-        return null;
-    }
-
-    return {
-        schemaVersion: candidate.schemaVersion,
-        lastUpdated: candidate.lastUpdated,
-    };
-}
-
-export function parseCachedDefaults(
-    raw: string | null,
-): SimulationLoaderData | null {
-    if (raw === null) {
-        return null;
-    }
-
-    const parsed = parseJson(raw);
-    return normalizeLoaderData(parsed);
-}
-
-export function normalizeLoaderData(
-    data: unknown,
-): SimulationLoaderData | null {
-    if (isSimulationLoaderDataLike(data)) {
-        return {
-            initialInputs: cloneInputs(data.initialInputs),
-            presets: data.presets.map(cloneIntervention),
-        };
-    }
-
-    // Backward compatibility for any previous payload that stored plain Inputs.
-    if (isInputsLike(data)) {
-        return makeLoaderData(data);
-    }
-
-    return null;
-}
-
-export function readSessionInputsFromStorage(
-    storage: SimulationStorage = sessionStorage,
-): Inputs | null {
-    const rawMeta = storage.getItem(SESSION_META_KEY);
-    const meta = parseSessionMeta(rawMeta);
-
-    if (
-        rawMeta !== null &&
-        (meta === null || meta.schemaVersion !== SESSION_SCHEMA_VERSION)
-    ) {
-        storage.removeItem(SESSION_INPUTS_KEY);
-        storage.removeItem(SESSION_META_KEY);
-        return null;
-    }
-
-    const rawInputs = storage.getItem(SESSION_INPUTS_KEY);
-    if (rawInputs === null) {
-        return null;
-    }
-
-    const parsed = parseJson(rawInputs);
-    if (!isInputsLike(parsed)) {
-        storage.removeItem(SESSION_INPUTS_KEY);
-        storage.removeItem(SESSION_META_KEY);
-        return null;
-    }
-
-    return cloneInputs(parsed);
-}
-
-export function persistSessionInputsToStorage(
-    inputs: Inputs,
-    storage: SimulationStorage = sessionStorage,
-    now: number = Date.now(),
-): void {
-    storage.setItem(SESSION_INPUTS_KEY, JSON.stringify(inputs));
-    storage.setItem(
-        SESSION_META_KEY,
-        JSON.stringify({
-            schemaVersion: SESSION_SCHEMA_VERSION,
-            lastUpdated: now,
-        }),
-    );
-}
-
-export function clearSessionInputsFromStorage(
-    storage: SimulationStorage = sessionStorage,
-): void {
-    storage.removeItem(SESSION_INPUTS_KEY);
-    storage.removeItem(SESSION_META_KEY);
-}
-
-export function applySessionInputsToLoaderData(
-    baseLoaderData: SimulationLoaderData,
-    sessionInputs: Inputs | null,
-): SimulationLoaderData {
-    if (sessionInputs === null) {
-        return baseLoaderData;
-    }
-
-    return {
-        ...baseLoaderData,
-        initialInputs: cloneInputs(sessionInputs),
-    };
-}
-
-export function makeLoaderData(inputs: Inputs): SimulationLoaderData {
-    return {
-        initialInputs: {
-            ...inputs,
-            interventions: inputs.interventions.map(cloneIntervention),
-        },
-        presets: inputs.interventions.map(cloneIntervention),
-    };
-}
-
-export function mapRunRequest(inputs: Inputs): unknown {
-    // Enforce a plain JSON payload shape before sending to the action.
-    return JSON.parse(JSON.stringify(inputs));
-}
-
-export function mapRunResponse(
-    response: Response,
-    result: string,
-): SimulationRunResponse {
-    if (!response.ok) {
-        return {
-            ok: false,
-            status: response.status,
-            error:
-                result ||
-                `Simulation run failed with status ${response.status}.`,
-        };
-    }
-
-    return {
-        ok: true,
-        status: response.status,
-        result,
-    };
-}
+export { mapRunRequest, mapRunResponse };
 
 // Action and Loader Hooks
 export async function loader() {
@@ -363,10 +89,14 @@ export async function clientLoader({ serverLoader }: Route.ClientLoaderArgs) {
 
     // Return cached API defaults when available, then apply current session state.
     const cachedDefaults = parseCachedDefaults(
-        sessionStorage.getItem(DEFAULT_INPUTS_KEY),
+        safeGetItem(sessionStorage, DEFAULT_INPUTS_KEY),
     );
     if (cachedDefaults !== null) {
         return applySessionInputsToLoaderData(cachedDefaults, sessionInputs);
+    }
+
+    if (safeGetItem(sessionStorage, DEFAULT_INPUTS_KEY) !== null) {
+        safeRemoveItem(sessionStorage, DEFAULT_INPUTS_KEY);
     }
 
     const serverData = (await serverLoader()) as unknown;
@@ -376,38 +106,29 @@ export async function clientLoader({ serverLoader }: Route.ClientLoaderArgs) {
         throw new Error("Invalid simulation loader data.");
     }
 
-    sessionStorage.setItem(DEFAULT_INPUTS_KEY, JSON.stringify(loaderData));
+    safeSetItem(
+        sessionStorage,
+        DEFAULT_INPUTS_KEY,
+        JSON.stringify(makeCachedDefaults(loaderData)),
+    );
 
     return applySessionInputsToLoaderData(loaderData, sessionInputs);
 }
 clientLoader.hydrate = true;
 
-async function processResponse(response: Response) {
-    if (response.body === null) {
-        return "";
-    }
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let result = "";
-
-    while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        // Decode raw bytes to string
-        const chunk = decoder.decode(value, { stream: true });
-        result += chunk;
-    }
-
-    // Final flush
-    result += decoder.decode();
-
-    return result;
-}
-
 export async function action({ request }: Route.ActionArgs) {
+    let data: unknown;
     try {
-        const data = await request.json();
+        data = await request.json();
+    } catch {
+        return invalidRunRequest("Invalid simulation request payload.");
+    }
 
+    if (!isInputsLike(data)) {
+        return invalidRunRequest("Invalid simulation request payload.");
+    }
+
+    try {
         // use the fetch api to send the json to the backend
         const response = await fetch(`${process.env.API_URL}/run`, {
             method: "POST",
@@ -419,9 +140,9 @@ export async function action({ request }: Route.ActionArgs) {
             },
         });
 
-        const result = await processResponse(response);
+        const result = await readResponseBody(response);
         if (!response.ok) {
-            console.log(result);
+            console.error(result);
         }
         return mapRunResponse(response, result);
     } catch (error) {
@@ -431,126 +152,6 @@ export async function action({ request }: Route.ActionArgs) {
             error: error instanceof Error ? error.message : "Unexpected error.",
         } as SimulationRunResponse;
     }
-}
-
-// temporarily commenting out for Alpha
-function SimulationContent({ presets }: { presets: Intervention[] }) {
-    const inputs = useInputs();
-    const fetcher = useFetcher<SimulationRunResponse>();
-    const nameValidationError = validateInterventionNames(inputs.interventions);
-    const interventionNameErrors = getInterventionNameErrors(
-        inputs.interventions,
-    );
-    const populationConstraintError = getSliderConstraintError(
-        inputs,
-        "total_population",
-    );
-
-    const handleSubmit = (): boolean => {
-        if (
-            nameValidationError !== null ||
-            populationConstraintError.hasViolation
-        ) {
-            return false;
-        }
-
-        const submission = mapRunRequest(inputs);
-        fetcher.submit(submission as never, {
-            method: "POST",
-            encType: "application/json",
-        });
-        return true;
-    };
-
-    const handleReset = () => {
-        if (window.confirm("Confirm request to reset data.")) {
-            clearSessionInputsFromStorage();
-            window.location.reload();
-        }
-    };
-
-    const pending = fetcher.state !== "idle";
-
-    // reference for the input section, used for checking intersection with the
-    // viewport
-    const inputRef = useRef<HTMLDivElement | null>(null);
-    const [inputsVisible, updateInputsVisible] = useState(false);
-    const [direction, updateDirection] = useState(ScrollDirection.Down);
-
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                // can select only the first entry because there is only one
-                // element we're checking for intersection with
-                const entry = entries[0];
-                if (entry.boundingClientRect.top < 0) {
-                    updateDirection(ScrollDirection.Up);
-                } else {
-                    updateDirection(ScrollDirection.Down);
-                }
-                updateInputsVisible(entry.isIntersecting);
-            },
-            { threshold: [0.05] },
-        );
-        if (inputRef.current !== null) {
-            observer.observe(inputRef.current);
-        }
-    }, []);
-
-    useEffect(() => {
-        const timeoutId = window.setTimeout(() => {
-            persistSessionInputsToStorage(inputs);
-        }, SESSION_WRITE_DEBOUNCE_MS);
-
-        return () => {
-            window.clearTimeout(timeoutId);
-        };
-    }, [inputs]);
-
-    return (
-        <main id="simulation">
-            <img
-                src={respond}
-                alt="RESPOND model structure diagram"
-                className="system-image"
-            />
-            {/*
-               `ref={inputRef}` is necessary here so that the
-               IntersectionObserver API functions to hide the scroll indicator
-               when this section is visible.
-             */}
-            <div id="inputs" ref={inputRef}>
-                <div className="input-button-wrapper">
-                    <Link className="glossary-button" to="/glossary">
-                        Glossary
-                    </Link>
-                    <button className="reset-data-button" onClick={handleReset}>
-                        Reset Data
-                    </button>
-                </div>
-                <ScrollIndicator
-                    destination="/simulation#inputs"
-                    options={{
-                        visible: !inputsVisible,
-                        direction: direction,
-                    }}
-                />
-                <Input
-                    handleSubmit={handleSubmit}
-                    nameValidationError={nameValidationError}
-                    interventionNameErrors={interventionNameErrors}
-                    populationConstraintError={
-                        populationConstraintError.hasViolation
-                            ? populationConstraintError.message
-                            : null
-                    }
-                    pending={pending}
-                    presets={presets}
-                    runResult={fetcher.data}
-                />
-            </div>
-        </main>
-    );
 }
 
 export default function Simulation() {
@@ -570,5 +171,29 @@ export default function Simulation() {
                 )}
             </Await>
         </Suspense>
+    );
+}
+
+export function ErrorBoundary({ error }: { error: unknown }) {
+    const revalidator = useRevalidator();
+    const isRetrying = revalidator.state === "loading";
+
+    return (
+        <main id="simulation-error" role="alert">
+            <h1>Simulation unavailable</h1>
+            <p>
+                The simulation defaults could not be loaded. Please try again.
+            </p>
+            {isRouteErrorResponse(error) && error.statusText ? (
+                <p>{error.statusText}</p>
+            ) : null}
+            <button
+                type="button"
+                onClick={() => revalidator.revalidate()}
+                disabled={isRetrying}
+            >
+                {isRetrying ? "Retrying..." : "Retry"}
+            </button>
+        </main>
     );
 }
