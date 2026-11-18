@@ -144,21 +144,19 @@ function Tabs({
         <>
             <div className="interventionTabs">
                 {interventions.map((intervention) => (
-                    <WrappedTooltip body={intervention.name}>
                     <Tab
                         key={intervention.id}
                         intervention={intervention}
                         nameError={nameErrorsById[intervention.id]}
                     />
-                    </WrappedTooltip>
                 ))}
                 <DropdownMenu>
                     <WrappedTooltip body="This is how you can add a new setting to the model. For example, you could add ‘Residential with Buprenorphine.’">
-                    <DropdownMenuTrigger asChild>
-                        <button className="interventionTab addTab">
-                            + New Intervention
-                        </button>
-                    </DropdownMenuTrigger>
+                        <DropdownMenuTrigger asChild>
+                            <button className="interventionTab addTab">
+                                + New Intervention
+                            </button>
+                        </DropdownMenuTrigger>
                     </WrappedTooltip>
                     <DropdownMenuContent className="add-intervention-dropdown">
                         <DropdownMenuItem

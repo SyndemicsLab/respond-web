@@ -29,7 +29,13 @@ interface TooltipProps {
     hover?: boolean;
 }
 
-export function WrappedTooltip({ children, body }: { children: ReactNode, body: string }) {
+export function WrappedTooltip({
+    children,
+    body,
+}: {
+    children: ReactNode;
+    body: string;
+}) {
     return (
         <div className="input-tooltip-wrapper">
             {children}
