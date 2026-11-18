@@ -10,8 +10,8 @@ import {
     mapRunResponse,
     normalizeLoaderData,
     parseCachedDefaults,
-    Simulation,
 } from "~/routes/simulation";
+import Simulation from "~/routes/simulation";
 import { ErrorBoundary as SimulationErrorBoundary } from "~/routes/simulation";
 import { HydrateFallback } from "~/root";
 import {
@@ -281,7 +281,7 @@ describe("Simulation route contract", () => {
             [
                 {
                     path: "/simulation",
-                    Component: <Simulation />,
+                    Component: Simulation,
                     HydrateFallback: HydrateFallback,
                     loader: () => {
                         attempts += 1;
