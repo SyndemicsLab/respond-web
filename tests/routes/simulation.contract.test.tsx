@@ -291,6 +291,22 @@ describe("Simulation route contract", () => {
                 },
             ],
             { initialEntries: ["/simulation"] },
+        const router = createMemoryRouter(
+            [
+                {
+                    path: "/simulation",
+                    Component: <Simulation />,
+                    HydrateFallback: HydrateFallback,
+                    loader: () => {
+                        attempts += 1;
+                        throw new Error("Defaults unavailable");
+                    },
+                    ErrorBoundary: () => (
+                        <SimulationErrorBoundary error={undefined as never} />
+                    ),
+                },
+            ],
+            { initialEntries: ["/simulation"] },
         );
 
         render(<RouterProvider router={router} />);
