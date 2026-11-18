@@ -10,6 +10,7 @@ import {
     mapRunResponse,
     normalizeLoaderData,
     parseCachedDefaults,
+    Simulation,
 } from "~/routes/simulation";
 import { ErrorBoundary as SimulationErrorBoundary } from "~/routes/simulation";
 import {
