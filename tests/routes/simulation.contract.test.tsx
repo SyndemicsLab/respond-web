@@ -13,6 +13,7 @@ import {
     Simulation,
 } from "~/routes/simulation";
 import { ErrorBoundary as SimulationErrorBoundary } from "~/routes/simulation";
+import { HydrateFallback } from "~/root";
 import {
     parseSimulationModelOutcome,
     type SimulationModelOutcome,
