@@ -318,6 +318,18 @@ input::-ms-track {
     border-radius: 4px;
 }
 
+input:focus-within {
+    &::-webkit-slider-thumb {
+        outline: 2px solid var(--tertiary-color);
+    }
+    &::-moz-range-thumb {
+        outline: 2px solid var(--tertiary-color);
+    }
+    &::-ms-thumb {
+        outline: 2px solid var(--tertiary-color);
+    }
+}
+
 input::-webkit-slider-thumb {
     -webkit-appearance: none;
     height: 18px;
@@ -409,6 +421,11 @@ button:hover {
     transform: scale(1.05);
 }
 
+button:focus,
+button:focus-within {
+    outline: 2px solid var(--secondary-color);
+}
+
 #interventions {
     background-color: rgba(from var(--primary-color) r g b / 10%);
     margin: var(--spacing) 0;
@@ -457,10 +474,12 @@ button:hover {
         opacity: 0;
         transition:
             opacity var(--transition-duration),
+            color var(--transition-duration),
             background-color var(--transition-duration);
 
         &:hover {
-            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            background-color: var(--tertiary-color);
             transform: none;
         }
     }
@@ -469,7 +488,7 @@ button:hover {
         background-color: var(--tertiary-color);
     }
 
-    &:hover {
+    &:hover, &:focus-within {
         background-color: var(--secondary-color);
         transform: scale(1.05);
 
@@ -495,9 +514,6 @@ button:hover {
         border-radius: 50%;
         filter: brightness(120%);
     }
-}
-
-.interventionTab {
 }
 
 .interventionContents {
@@ -804,7 +820,8 @@ input[type="text"].intervention-name-input-error {
     z-index: 1000;
 }
 
-*:hover > .input-tooltip-hover {
+*:hover > .input-tooltip-hover,
+*:focus-within > .input-tooltip-hover {
     opacity: 0.9;
 }
 
@@ -812,8 +829,14 @@ input[type="text"].intervention-name-input-error {
     @include buttons.circular-button($size: 1rem, $font-size: 0.5rem);
     display: inline-flex;
     position: relative;
+    padding: unset;
+    cursor: unset;
     color: #fff;
-    transition-duration: var(--transition-duration);
+    transition: color var(--transition-duration);
+
+    &:hover {
+        transform: unset;
+    }
 
     .input-tooltip-hover {
         width: 30rem;

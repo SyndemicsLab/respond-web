@@ -96,7 +96,7 @@ function Tab({
     const dispatch = useInputsDispatch();
     return (
         <>
-            <div
+            <button
                 className={`interventionTab${intervention.active ? " active" : ""}`}
                 onClick={() =>
                     dispatch({
@@ -125,7 +125,7 @@ function Tab({
                         ×
                     </button>
                 )}
-            </div>
+            </button>
         </>
     );
 }

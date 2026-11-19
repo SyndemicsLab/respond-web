@@ -29,6 +29,15 @@ interface TooltipProps {
     hover?: boolean;
 }
 
+function TooltipTrigger({ children }: { children?: ReactNode }) {
+    return(
+        <button className="input-tooltip">
+            <FontAwesomeIcon icon={faInfo} />
+            {children}
+        </button>
+    );
+}
+
 export function WrappedTooltip({
     children,
     body,
@@ -46,12 +55,9 @@ export function WrappedTooltip({
 
 function HoverTooltip({ body }: { body: string }) {
     return (
-        <>
-            <div className="input-tooltip">
-                <FontAwesomeIcon icon={faInfo} />
-                <div className="input-tooltip-hover">{body}</div>
-            </div>
-        </>
+        <TooltipTrigger>
+            <div className="input-tooltip-hover">{body}</div>
+        </TooltipTrigger>
     );
 }
 
@@ -65,9 +71,7 @@ function DialogTooltip({
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <div className="input-tooltip">
-                    <FontAwesomeIcon icon={faInfo} />
-                </div>
+                <TooltipTrigger />
             </DialogTrigger>
             <DialogContent className="rounded-2xl bg-white max-w-1/2">
                 <DialogTitle>{`About "${inputName}"`}</DialogTitle>
