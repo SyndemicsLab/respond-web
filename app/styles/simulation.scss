@@ -450,7 +450,6 @@ button:focus-within {
 
     &.addTab {
         background-color: var(--secondary-color);
-        outline: none;
     }
 
     & > .delete-button {
@@ -494,7 +493,15 @@ button:focus-within {
 
         & > .delete-button {
             opacity: 1;
+
+            &:focus {
+                outline: 2px solid var(--secondary-color);
+            }
         }
+    }
+
+    &:focus {
+        outline: 2px solid var(--tertiary-color);
     }
 
     & .intervention-name-error {
