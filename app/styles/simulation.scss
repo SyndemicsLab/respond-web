@@ -195,6 +195,80 @@
         @include buttons.info-button($color: var(--secondary-color));
         margin: unset;
     }
+
+    .tutorial-button {
+        @include buttons.info-button($color: var(--tertiary-color));
+        margin: unset;
+    }
+}
+
+.tutorial-dialog {
+    width: min(94vw, 1100px);
+    max-width: 1100px;
+    background-color: #fff;
+}
+
+.tutorial-carousel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.tutorial-page {
+    display: block;
+    width: 100%;
+    max-height: calc(100vh - 13rem);
+    object-fit: contain;
+}
+
+.tutorial-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+}
+
+.tutorial-navigation {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-width: 7rem;
+    min-height: 2.5rem;
+    justify-content: center;
+    border: 1px solid var(--tertiary-color);
+    border-radius: var(--border-radius);
+    color: var(--tertiary-color);
+    background: transparent;
+    cursor: pointer;
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.45;
+    }
+}
+
+.tutorial-page-count {
+    color: var(--tertiary-color);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+    .tutorial-controls {
+        flex-wrap: wrap;
+    }
+
+    .tutorial-page-count {
+        order: -1;
+        width: 100%;
+        text-align: center;
+    }
+
+    .tutorial-navigation {
+        flex: 1;
+    }
 }
 
 input[type="text"] {
@@ -250,6 +324,7 @@ input::-webkit-slider-thumb {
     margin-top: -5px;
     transition-duration: var(--transition-duration);
 }
+
 input::-moz-range-thumb {
     height: 18px;
     width: 18px;
@@ -257,6 +332,7 @@ input::-moz-range-thumb {
     border: none;
     transition-duration: var(--transition-duration);
 }
+
 input::-ms-thumb {
     height: 18px;
     width: 18px;
@@ -268,9 +344,11 @@ input::-ms-thumb {
 input::-webkit-slider-thumb:hover {
     background: var(--tertiary-color);
 }
+
 input::-moz-range-thumb:hover {
     background: var(--tertiary-color);
 }
+
 input::-ms-thumb:hover {
     background: var(--tertiary-color);
 }
@@ -461,6 +539,7 @@ button:hover {
 
 input[type="text"].intervention-name-input-error {
     border: 2px solid var(--secondary-color);
+
     &:focus {
         outline: 1px solid var(--secondary-color);
     }
