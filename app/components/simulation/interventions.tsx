@@ -32,7 +32,7 @@ import {
     CollapsibleTrigger,
 } from "@radix-ui/react-collapsible";
 import { PROPORTION_MIN, PROPORTION_STEP, PROPORTION_MAX } from "~/globals";
-import { WrappedTooltip } from "@components/ui/tooltip";
+import Tooltip, { WrappedTooltip } from "@components/ui/tooltip";
 
 function normalizeInterventionName(name: string): string {
     return name.trim().replace(/\s+/g, " ");
@@ -95,38 +95,41 @@ function Tab({
     // commented temporarily for alpha
     const dispatch = useInputsDispatch();
     return (
-        <>
+        <div className="intervention-tab-wrapper">
             <button
                 className={`interventionTab${intervention.active ? " active" : ""}`}
-                onClick={() =>
-                    dispatch({
-                        type: "intervention select",
-                        id: intervention.id,
-                    })
+                onClick={() => {
+                        dispatch({
+                            type: "intervention select",
+                            id: intervention.id,
+                        });
+                        // remove focus from the current element
+                        document?.activeElement?.blur();
+                    }
                 }
             >
                 {nameError ? (
                     <div className="intervention-name-error">!</div>
                 ) : null}
                 {intervention.name ? intervention.name : "<no name>"}
-                {intervention.id > 0 && (
-                    <button
-                        className="delete-button"
-                        onClick={(event) => {
-                            dispatch({
-                                type: "intervention delete",
-                                id: intervention.id,
-                            });
-                            // avoid also selecting the tab underneath while
-                            // closing (selection overrides deletion)
-                            event.stopPropagation();
-                        }}
-                    >
-                        ×
-                    </button>
-                )}
             </button>
-        </>
+            {intervention.id > 0 && (
+                <button
+                    className="delete-button"
+                    onClick={(event) => {
+                        dispatch({
+                            type: "intervention delete",
+                            id: intervention.id,
+                        });
+                        // avoid also selecting the tab underneath while
+                        // closing (selection overrides deletion)
+                        event.stopPropagation();
+                    }}
+                >
+                    ×
+                </button>
+            )}
+        </div>
     );
 }
 
@@ -151,7 +154,7 @@ function Tabs({
                     />
                 ))}
                 <DropdownMenu>
-                    <WrappedTooltip body="This is how you can add a new setting to the model. For example, you could add ‘Residential with Buprenorphine.’">
+                    <WrappedTooltip body="This is how you can add a new setting to the model. For example, you could add a new intervention and call it ‘Residential with Buprenorphine.’">
                         <DropdownMenuTrigger asChild>
                             <button className="interventionTab addTab">
                                 + New Intervention
@@ -312,33 +315,10 @@ function InterventionInfo({
                         resolved.
                     </p>
                 ) : null}
-                {intervention.description && !intervention.info ? (
+                {intervention.description ? (
                     <p className="intervention-description">
                         {intervention.description}
                     </p>
-                ) : null}
-                {intervention.description && intervention.info ? (
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <Button
-                                variant="outline"
-                                className="intervention-info"
-                            >
-                                <FontAwesomeIcon icon={faInfo} />
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="bg-white lg:max-w-[1000px] max-w-[425px] p-9">
-                            <DialogHeader>
-                                <DialogTitle>{name}</DialogTitle>
-                                <DialogDescription>
-                                    {`More information about ${name}.`}
-                                </DialogDescription>
-                            </DialogHeader>
-                            <div className="grid gap-4 py-4">
-                                {intervention.description}
-                            </div>
-                        </DialogContent>
-                    </Dialog>
                 ) : null}
             </div>
             {nameError && intervention.info ? (
@@ -403,7 +383,10 @@ function Content({
                     defaultOpen={intervention.id === 0 ? true : false}
                 >
                     <CollapsibleTrigger asChild>
-                        <h3>Transitions Between Interventions</h3>
+                        <div className="block-trans-heading">
+                            <h3>Transitions Between Interventions</h3>
+                            <Tooltip hover={true} body="Each slider in this section represents the percent of individuals who move from this setting to the corresponding other setting each week." />
+                        </div>
                     </CollapsibleTrigger>
                     <CollapsibleContent className="block-trans-collapsible">
                         <Transitions

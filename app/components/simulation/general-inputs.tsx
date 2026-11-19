@@ -64,7 +64,7 @@ export default function GeneralInputs() {
             inputVar: "changing_population",
             inputText: "Change in Population Per Week (Count)",
             inputDescription:
-                "The number of people entering or leaving the population each week.",
+                "The number of people entering (positive value) or leaving (negative value) the population each week.",
             min: CHANGING_POP_MIN,
             max: CHANGING_POP_MAX,
             step: CHANGING_POP_STEP,
@@ -78,6 +78,8 @@ export default function GeneralInputs() {
         {
             inputVar: "fatal_overdoses",
             inputText: "Percent of Overdoses That Result in Death",
+            inputDescription:
+                "In each intervention setting, some portion of those actively using opioids each week overdose. This value represents the percent of those who overdose that die.",
             min: FATAL_OD_MIN,
             max: FATAL_OD_MAX,
             step: FATAL_OD_STEP,
