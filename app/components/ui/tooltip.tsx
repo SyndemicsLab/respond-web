@@ -4,7 +4,7 @@
 // Created: 2026-11-16                                                        //
 // Author: Dimitri Baptiste                                                   //
 // -----                                                                      //
-// Last Modified: 2026-11-16                                                  //
+// Last Modified: 2026-11-19                                                  //
 // Modified By: Dimitri Baptiste                                              //
 // -----                                                                      //
 // Copyright (c) 2026 Syndemics Lab at Boston Medical Center                  //
@@ -82,10 +82,5 @@ function DialogTooltip({
 }
 
 export default function Tooltip({ inputName, body, hover }: TooltipProps) {
-    const tooltip = hover ? (
-        <HoverTooltip body={body} />
-    ) : (
-        <DialogTooltip inputName={inputName} body={body} />
-    );
-    return tooltip;
+    return hover ? <HoverTooltip body={body} /> : <DialogTooltip inputName={inputName} body={body} />;
 }
