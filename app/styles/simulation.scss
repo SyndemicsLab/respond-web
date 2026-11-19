@@ -198,6 +198,10 @@
     .reset-data-button {
         @include buttons.info-button($color: var(--secondary-color));
         margin: unset;
+
+        &:focus-within {
+            outline: 2px solid var(--tertiary-color);
+        }
     }
 
     .tutorial-button {
