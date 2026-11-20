@@ -177,6 +177,12 @@
     margin: calc(var(--spacing) * 3);
     border-radius: var(--border-radius);
 
+    h3 {
+        font-size: 1.25rem;
+        font-weight: bold;
+        width: fit-content;
+    }
+
     @media (min-width: 1500px) {
         margin: 0 0 var(--spacing) 0;
         padding: calc(var(--spacing) * 3);
@@ -625,21 +631,20 @@ input[type="text"].intervention-name-input-error {
     aspect-ratio: 1 / 1;
 }
 
-.block-trans-heading {
+.block-trans-heading,
+.overdose-heading {
     display: flex;
     flex-direction: row;
     align-items: center;
+    gap: 0.5rem;
 }
 
 .block-trans-root {
-    *:not(h3):not(svg) {
+    *:not(h3):not(svg):not(.input-tooltip) {
         margin-left: 0.5rem;
     }
 
     h3 {
-        font-size: 1.25rem;
-        font-weight: bold;
-        width: fit-content;
         cursor: pointer;
         transition: color var(--transition-duration);
 

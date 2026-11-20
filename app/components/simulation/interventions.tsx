@@ -154,7 +154,7 @@ function Tabs({
                     />
                 ))}
                 <DropdownMenu>
-                    <WrappedTooltip body="This is how you can add a new setting to the model. For example, you could add a new intervention and call it ‘Residential with Buprenorphine.’">
+                    <WrappedTooltip body="This is how you can add a new setting to the model. For example, you could add a new intervention and call it ‘Residential with Buprenorphine.’ When you add a new setting, you must supply additional data, e.g., initial population size, transition rates into the setting, and transitions out of the setting.">
                         <DropdownMenuTrigger asChild>
                             <button className="interventionTab addTab">
                                 + New Intervention
@@ -253,6 +253,10 @@ function Overdoses({
 }) {
     return (
         <>
+            <div className="overdose-heading">
+                <h3>Overdose Likelihood</h3>
+                <Tooltip hover={true} body="Some portion of the population actively using opioids experiences an overdose each week. This section allows you to define what percentage of people in this intervention overdose each week, split up by injection or non-injection pathways of opioid use." />
+            </div>
             {overdoses.map((overdose) => (
                 <Slider
                     key={overdose.injection ? 1 : 0}
