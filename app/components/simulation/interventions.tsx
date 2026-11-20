@@ -257,7 +257,7 @@ function Overdoses({
     return (
         <>
             <div className="overdose-heading">
-                <h3>Overdose Likelihood</h3>
+                <h3>Overdose Percentages</h3>
                 <Tooltip hover={true} body="Some portion of the population actively using opioids experiences an overdose each week. This section allows you to define what percentage of people in this intervention overdose each week, split up by injection or non-injection pathways of opioid use." />
             </div>
             {overdoses.map((overdose) => (
@@ -360,6 +360,9 @@ function Content({
                 <Slider
                     inputText="Intervention Population Size"
                     inputVar={`${intervention.name}_population`}
+                    inputDescription={
+                        "The number of people from the Initial Total Population that are in this setting at the beginning of the simulation. This value cannot be set manually in No Treatment; it is calculated as the remainder of the population after accounting for the other intervention settings."
+                    }
                     min={0}
                     max={200000}
                     step={1000}
@@ -377,6 +380,9 @@ function Content({
                     <Slider
                         inputText="Post-Treatment Population Size"
                         inputVar={`post_${intervention.name}_population`}
+                        inputDescription={
+                            `The amount of people who, at the beginning of the simulation, have elevated risk of overdose due to having recently discontinued treatment. Cannot be set manually. Calculated as the Intervention Population Size ⨯ Percent of Population Moving to Post-${intervention.name} Per Week.`
+                        }
                         min={0}
                         max={200000}
                         step={1000}
