@@ -13,25 +13,14 @@ import type {
     Transition,
     Overdose,
 } from "~/features/simulation/model";
-import { useState } from "react";
-import Slider from "~/components/ui/slider";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-    DialogDescription,
-} from "@components/ui/dialog";
-import { Button } from "@components/ui/button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faInfo } from "@fortawesome/free-solid-svg-icons";
+import Slider from "@components/ui/slider";
 import {
     Collapsible,
     CollapsibleContent,
     CollapsibleTrigger,
 } from "@radix-ui/react-collapsible";
 import { PROPORTION_MIN, PROPORTION_STEP, PROPORTION_MAX } from "~/globals";
+import Tooltip, { WrappedTooltip } from "@components/ui/tooltip";
 
 function normalizeInterventionName(name: string): string {
     return name.trim().replace(/\s+/g, " ");
@@ -94,38 +83,40 @@ function Tab({
     // commented temporarily for alpha
     const dispatch = useInputsDispatch();
     return (
-        <>
-            <div
+        <div className="intervention-tab-wrapper">
+            <button
                 className={`interventionTab${intervention.active ? " active" : ""}`}
-                onClick={() =>
+                onClick={() => {
                     dispatch({
                         type: "intervention select",
                         id: intervention.id,
-                    })
-                }
+                    });
+                    // remove focus from the current element
+                    (document?.activeElement as HTMLElement)?.blur();
+                }}
             >
                 {nameError ? (
                     <div className="intervention-name-error">!</div>
                 ) : null}
                 {intervention.name ? intervention.name : "<no name>"}
-                {intervention.id > 0 && (
-                    <button
-                        className="delete-button"
-                        onClick={(event) => {
-                            dispatch({
-                                type: "intervention delete",
-                                id: intervention.id,
-                            });
-                            // avoid also selecting the tab underneath while
-                            // closing (selection overrides deletion)
-                            event.stopPropagation();
-                        }}
-                    >
-                        ×
-                    </button>
-                )}
-            </div>
-        </>
+            </button>
+            {intervention.id > 0 && (
+                <button
+                    className="delete-button"
+                    onClick={(event) => {
+                        dispatch({
+                            type: "intervention delete",
+                            id: intervention.id,
+                        });
+                        // avoid also selecting the tab underneath while
+                        // closing (selection overrides deletion)
+                        event.stopPropagation();
+                    }}
+                >
+                    ×
+                </button>
+            )}
+        </div>
     );
 }
 
@@ -150,12 +141,17 @@ function Tabs({
                     />
                 ))}
                 <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <button className="interventionTab addTab disabled">
-                            + New Intervention
-                        </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="add-intervention-dropdown">
+                    <WrappedTooltip body="This is how you can add a new setting to the model. For example, you could add a new intervention and call it ‘Residential with Buprenorphine.’ When you add a new setting, you must supply additional data, e.g., initial population size, transition rates into the setting, and transitions out of the setting.">
+                        <DropdownMenuTrigger asChild>
+                            <button className="interventionTab addTab">
+                                + New Intervention
+                            </button>
+                        </DropdownMenuTrigger>
+                    </WrappedTooltip>
+                    <DropdownMenuContent
+                        className="add-intervention-dropdown"
+                        onCloseAutoFocus={() => event?.preventDefault()}
+                    >
                         <DropdownMenuItem
                             className="add-intervention-item"
                             onSelect={() =>
@@ -247,6 +243,13 @@ function Overdoses({
 }) {
     return (
         <>
+            <div className="overdose-heading">
+                <h3>Overdose Percentages</h3>
+                <Tooltip
+                    hover={true}
+                    body="Some portion of the population actively using opioids experiences an overdose each week. This section allows you to define what percentage of people in this intervention overdose each week, split up by injection or non-injection pathways of opioid use."
+                />
+            </div>
             {overdoses.map((overdose) => (
                 <Slider
                     key={overdose.injection ? 1 : 0}
@@ -273,7 +276,6 @@ function InterventionInfo({
     nameError?: string;
 }) {
     const dispatch = useInputsDispatch();
-    const [name] = useState(intervention.name);
     return (
         <div className="intervention-name">
             <div className="inputName">
@@ -309,33 +311,10 @@ function InterventionInfo({
                         resolved.
                     </p>
                 ) : null}
-                {intervention.description && !intervention.info ? (
+                {intervention.description ? (
                     <p className="intervention-description">
                         {intervention.description}
                     </p>
-                ) : null}
-                {intervention.description && intervention.info ? (
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <Button
-                                variant="outline"
-                                className="intervention-info"
-                            >
-                                <FontAwesomeIcon icon={faInfo} />
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="bg-white lg:max-w-[1000px] max-w-[425px] p-9">
-                            <DialogHeader>
-                                <DialogTitle>{name}</DialogTitle>
-                                <DialogDescription>
-                                    {`More information about ${name}.`}
-                                </DialogDescription>
-                            </DialogHeader>
-                            <div className="grid gap-4 py-4">
-                                {intervention.description}
-                            </div>
-                        </DialogContent>
-                    </Dialog>
                 ) : null}
             </div>
             {nameError && intervention.info ? (
@@ -370,6 +349,9 @@ function Content({
                 <Slider
                     inputText="Intervention Population Size"
                     inputVar={`${intervention.name}_population`}
+                    inputDescription={
+                        "The number of people from the Initial Total Population that are in this setting at the beginning of the simulation. This value cannot be set manually in No Treatment; it is calculated as the remainder of the population after accounting for the other intervention settings."
+                    }
                     min={0}
                     max={200000}
                     step={1000}
@@ -387,6 +369,7 @@ function Content({
                     <Slider
                         inputText="Post-Treatment Population Size"
                         inputVar={`post_${intervention.name}_population`}
+                        inputDescription={`The amount of people who, at the beginning of the simulation, have elevated risk of overdose due to having recently discontinued treatment. Cannot be set manually. Calculated as the Intervention Population Size ⨯ Percent of Population Moving to Post-${intervention.name} Per Week.`}
                         min={0}
                         max={200000}
                         step={1000}
@@ -400,7 +383,13 @@ function Content({
                     defaultOpen={intervention.id === 0 ? true : false}
                 >
                     <CollapsibleTrigger asChild>
-                        <h3>Transitions Between Interventions</h3>
+                        <div className="block-trans-heading">
+                            <h3>Transitions Between Interventions</h3>
+                            <Tooltip
+                                hover={true}
+                                body="Each slider in this section represents the percent of individuals who move from this setting to the corresponding other setting each week."
+                            />
+                        </div>
                     </CollapsibleTrigger>
                     <CollapsibleContent className="block-trans-collapsible">
                         <Transitions

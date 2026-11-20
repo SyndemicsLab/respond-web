@@ -289,9 +289,14 @@ export function deleteIntervention(
             if (newIntervention.id !== 0) {
                 return newIntervention;
             }
+            // only No Treatment makes it this far
             if (!toDelete.postPopulation) {
-                return intervention;
+                return {
+                    ...intervention,
+                    active: intervention.active || deletingActive,
+                };
             }
+            //
             return {
                 ...newIntervention,
                 active: intervention.active || deletingActive,

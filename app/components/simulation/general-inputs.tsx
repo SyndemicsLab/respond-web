@@ -32,7 +32,8 @@ export default function GeneralInputs() {
         {
             inputVar: "duration",
             inputText: "Simulation Duration (Weeks)",
-            inputDescription: "The number of weeks for the simulation to run.",
+            inputDescription:
+                "This tells the simulation how long to run. We use weekly time-steps, so a value of ‘52’ here makes the model run for 1 year. (104 = 2 years; 364 = 7 years)",
             min: DURATION_MIN,
             // limiting duration to 7 years in Alpha
             max: DURATION_MAX,
@@ -62,6 +63,8 @@ export default function GeneralInputs() {
         {
             inputVar: "changing_population",
             inputText: "Change in Population Per Week (Count)",
+            inputDescription:
+                "The number of people entering (positive value) or leaving (negative value) the population each week.",
             min: CHANGING_POP_MIN,
             max: CHANGING_POP_MAX,
             step: CHANGING_POP_STEP,
@@ -75,6 +78,8 @@ export default function GeneralInputs() {
         {
             inputVar: "fatal_overdoses",
             inputText: "Percent of Overdoses That Result in Death",
+            inputDescription:
+                "In each intervention setting, some portion of those actively using opioids each week overdose. This value represents the percent of those who overdose that die.",
             min: FATAL_OD_MIN,
             max: FATAL_OD_MAX,
             step: FATAL_OD_STEP,
