@@ -11,6 +11,7 @@ import {
     getInterventionNameErrors,
 } from "@simulation/interventions";
 import Input from "@simulation/inputs";
+import SimulationTutorial from "@components/simulation/tutorial";
 import { getSliderConstraintError } from "~/features/simulation/reducer";
 import {
     clearSessionInputsFromStorage,
@@ -108,6 +109,7 @@ export default function SimulationContent({
                     <Link className="glossary-button" to="/glossary">
                         Glossary
                     </Link>
+                    <SimulationTutorial />
                     <button className="reset-data-button" onClick={handleReset}>
                         Reset Data
                     </button>
