@@ -24,13 +24,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfo } from "@fortawesome/free-solid-svg-icons";
 
 interface TooltipProps {
-    inputName: string;
     body: string;
+    inputName?: string;
     hover?: boolean;
 }
 
 function TooltipTrigger({ children }: { children?: ReactNode }) {
-    return(
+    return (
         <button className="input-tooltip">
             <FontAwesomeIcon icon={faInfo} />
             {children}
@@ -82,5 +82,9 @@ function DialogTooltip({
 }
 
 export default function Tooltip({ inputName, body, hover }: TooltipProps) {
-    return hover ? <HoverTooltip body={body} /> : <DialogTooltip inputName={inputName} body={body} />;
+    return hover ? (
+        <HoverTooltip body={body} />
+    ) : (
+        <DialogTooltip inputName={inputName ? inputName : ""} body={body} />
+    );
 }

@@ -461,7 +461,8 @@ button:focus-within {
         anchor-name: --tab-anchor;
     }
 
-    &:hover > .delete-button, &:focus-within > .delete-button {
+    &:hover > .delete-button,
+    &:focus-within > .delete-button {
         opacity: 1;
 
         &:focus {
@@ -483,7 +484,8 @@ button:focus-within {
         background-color: var(--tertiary-color);
     }
 
-    &:hover, &:focus-within {
+    &:hover,
+    &:focus-within {
         background-color: var(--secondary-color);
         transform: scale(1.05);
     }

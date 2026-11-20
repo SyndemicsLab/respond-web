@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useFetcher, useNavigate } from "react-router";
+import { useFetcher, useNavigate } from "react-router";
 import type { Intervention } from "~/features/simulation/model";
 import type { SimulationRunResponse } from "@components/simulation/types";
 import ScrollIndicator, {
@@ -107,7 +107,10 @@ export default function SimulationContent({
             />
             <div id="inputs" ref={inputRef}>
                 <div className="input-button-wrapper">
-                    <button className="glossary-button" onClick={() => navigate(`/glossary`)}>
+                    <button
+                        className="glossary-button"
+                        onClick={() => navigate(`/glossary`)}
+                    >
                         Glossary
                     </button>
                     <SimulationTutorial />

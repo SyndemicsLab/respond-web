@@ -13,19 +13,7 @@ import type {
     Transition,
     Overdose,
 } from "~/features/simulation/model";
-import { useState } from "react";
 import Slider from "@components/ui/slider";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-    DialogDescription,
-} from "@components/ui/dialog";
-import { Button } from "@components/ui/button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faInfo } from "@fortawesome/free-solid-svg-icons";
 import {
     Collapsible,
     CollapsibleContent,
@@ -99,14 +87,13 @@ function Tab({
             <button
                 className={`interventionTab${intervention.active ? " active" : ""}`}
                 onClick={() => {
-                        dispatch({
-                            type: "intervention select",
-                            id: intervention.id,
-                        });
-                        // remove focus from the current element
-                        document?.activeElement?.blur();
-                    }
-                }
+                    dispatch({
+                        type: "intervention select",
+                        id: intervention.id,
+                    });
+                    // remove focus from the current element
+                    (document?.activeElement as HTMLElement)?.blur();
+                }}
             >
                 {nameError ? (
                     <div className="intervention-name-error">!</div>
@@ -163,7 +150,7 @@ function Tabs({
                     </WrappedTooltip>
                     <DropdownMenuContent
                         className="add-intervention-dropdown"
-                        onCloseAutoFocus={() => event.preventDefault() }
+                        onCloseAutoFocus={() => event?.preventDefault()}
                     >
                         <DropdownMenuItem
                             className="add-intervention-item"
@@ -258,7 +245,10 @@ function Overdoses({
         <>
             <div className="overdose-heading">
                 <h3>Overdose Percentages</h3>
-                <Tooltip hover={true} body="Some portion of the population actively using opioids experiences an overdose each week. This section allows you to define what percentage of people in this intervention overdose each week, split up by injection or non-injection pathways of opioid use." />
+                <Tooltip
+                    hover={true}
+                    body="Some portion of the population actively using opioids experiences an overdose each week. This section allows you to define what percentage of people in this intervention overdose each week, split up by injection or non-injection pathways of opioid use."
+                />
             </div>
             {overdoses.map((overdose) => (
                 <Slider
@@ -286,7 +276,6 @@ function InterventionInfo({
     nameError?: string;
 }) {
     const dispatch = useInputsDispatch();
-    const [name] = useState(intervention.name);
     return (
         <div className="intervention-name">
             <div className="inputName">
@@ -380,9 +369,7 @@ function Content({
                     <Slider
                         inputText="Post-Treatment Population Size"
                         inputVar={`post_${intervention.name}_population`}
-                        inputDescription={
-                            `The amount of people who, at the beginning of the simulation, have elevated risk of overdose due to having recently discontinued treatment. Cannot be set manually. Calculated as the Intervention Population Size ⨯ Percent of Population Moving to Post-${intervention.name} Per Week.`
-                        }
+                        inputDescription={`The amount of people who, at the beginning of the simulation, have elevated risk of overdose due to having recently discontinued treatment. Cannot be set manually. Calculated as the Intervention Population Size ⨯ Percent of Population Moving to Post-${intervention.name} Per Week.`}
                         min={0}
                         max={200000}
                         step={1000}
@@ -398,7 +385,10 @@ function Content({
                     <CollapsibleTrigger asChild>
                         <div className="block-trans-heading">
                             <h3>Transitions Between Interventions</h3>
-                            <Tooltip hover={true} body="Each slider in this section represents the percent of individuals who move from this setting to the corresponding other setting each week." />
+                            <Tooltip
+                                hover={true}
+                                body="Each slider in this section represents the percent of individuals who move from this setting to the corresponding other setting each week."
+                            />
                         </div>
                     </CollapsibleTrigger>
                     <CollapsibleContent className="block-trans-collapsible">
