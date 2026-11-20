@@ -161,7 +161,10 @@ function Tabs({
                             </button>
                         </DropdownMenuTrigger>
                     </WrappedTooltip>
-                    <DropdownMenuContent className="add-intervention-dropdown">
+                    <DropdownMenuContent
+                        className="add-intervention-dropdown"
+                        onCloseAutoFocus={() => event.preventDefault() }
+                    >
                         <DropdownMenuItem
                             className="add-intervention-item"
                             onSelect={() =>
