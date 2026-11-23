@@ -10,7 +10,7 @@ Per section C.4.4 of the HEAL D2A Modeling and Economic Resource Center (MERC) g
 
 ## Codebase Structure (Maintainability Guide)
 
-This project uses React Router v7 Framework Mode route modules and a feature-first organization for simulation logic.
+This project uses [React Router][react-router] v8 Framework Mode route modules and a feature-first organization for simulation logic.
 
 ### Top-level directories
 
@@ -167,3 +167,5 @@ When adding behavior, prefer:
 - Avoid mutating state in reducers/helpers.
 - Keep API payload shaping in mapper functions near route boundaries.
 - Keep chart code typed (avoid `@ts-nocheck`) and handle empty datasets defensively.
+
+[react-router]: https://reactrouter.com "React Router"

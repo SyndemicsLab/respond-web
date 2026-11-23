@@ -1,3 +1,19 @@
+////////////////////////////////////////////////////////////////////////////////
+// File: tooltip.tsx                                                          //
+// Project: merc-ui                                                           //
+// Created: 2026-11-16                                                        //
+// Author: Dimitri Baptiste                                                   //
+// -----                                                                      //
+// Last Modified: 2026-11-19                                                  //
+// Modified By: Dimitri Baptiste                                              //
+// -----                                                                      //
+// Copyright (c) 2026 Syndemics Lab at Boston Medical Center                  //
+////////////////////////////////////////////////////////////////////////////////
+
+// type imports
+import { type ReactNode } from "react";
+
+// component imports
 import {
     Dialog,
     DialogContent,
@@ -8,19 +24,40 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfo } from "@fortawesome/free-solid-svg-icons";
 
 interface TooltipProps {
-    inputName: string;
     body: string;
+    inputName?: string;
     hover?: boolean;
+}
+
+function TooltipTrigger({ children }: { children?: ReactNode }) {
+    return (
+        <button className="input-tooltip">
+            <FontAwesomeIcon icon={faInfo} />
+            {children}
+        </button>
+    );
+}
+
+export function WrappedTooltip({
+    children,
+    body,
+}: {
+    children: ReactNode;
+    body: string;
+}) {
+    return (
+        <div className="input-tooltip-wrapper">
+            {children}
+            <div className="input-tooltip-hover">{body}</div>
+        </div>
+    );
 }
 
 function HoverTooltip({ body }: { body: string }) {
     return (
-        <>
-            <div className="input-tooltip">
-                <FontAwesomeIcon icon={faInfo} />
-                <div className="input-tooltip-hover">{body}</div>
-            </div>
-        </>
+        <TooltipTrigger>
+            <div className="input-tooltip-hover">{body}</div>
+        </TooltipTrigger>
     );
 }
 
@@ -34,9 +71,7 @@ function DialogTooltip({
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <div className="input-tooltip">
-                    <FontAwesomeIcon icon={faInfo} />
-                </div>
+                <TooltipTrigger />
             </DialogTrigger>
             <DialogContent className="rounded-2xl bg-white max-w-1/2">
                 <DialogTitle>{`About "${inputName}"`}</DialogTitle>
@@ -47,10 +82,9 @@ function DialogTooltip({
 }
 
 export default function Tooltip({ inputName, body, hover }: TooltipProps) {
-    const tooltip = hover ? (
+    return hover ? (
         <HoverTooltip body={body} />
     ) : (
-        <DialogTooltip inputName={inputName} body={body} />
+        <DialogTooltip inputName={inputName ? inputName : ""} body={body} />
     );
-    return tooltip;
 }

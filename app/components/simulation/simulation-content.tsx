@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useFetcher } from "react-router";
+import { useFetcher, useNavigate } from "react-router";
 import type { Intervention } from "~/features/simulation/model";
 import type { SimulationRunResponse } from "@components/simulation/types";
 import ScrollIndicator, {
@@ -29,6 +29,7 @@ export default function SimulationContent({
     presets: Intervention[];
 }) {
     const inputs = useInputs();
+    const navigate = useNavigate();
     const fetcher = useFetcher<SimulationRunResponse>();
     const nameValidationError = validateInterventionNames(inputs.interventions);
     const interventionNameErrors = getInterventionNameErrors(
@@ -106,9 +107,12 @@ export default function SimulationContent({
             />
             <div id="inputs" ref={inputRef}>
                 <div className="input-button-wrapper">
-                    <Link className="glossary-button" to="/glossary">
+                    <button
+                        className="glossary-button"
+                        onClick={() => navigate(`/glossary`)}
+                    >
                         Glossary
-                    </Link>
+                    </button>
                     <SimulationTutorial />
                     <button className="reset-data-button" onClick={handleReset}>
                         Reset Data
