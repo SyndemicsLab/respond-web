@@ -296,7 +296,6 @@ export function deleteIntervention(
                     active: intervention.active || deletingActive,
                 };
             }
-            //
             return {
                 ...newIntervention,
                 active: intervention.active || deletingActive,
